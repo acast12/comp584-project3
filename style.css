@@ -1,16 +1,3 @@
-/* Border box declaration 
-https://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
-html {
-  box-sizing: border-box;
-}
-/* inherit border-box on all elements in the universe and before and after
- */
-*, 
-*:before, 
-*:after {
-  box-sizing: inherit;
-}
-
 body {
 	font-family: Arial, Geneva, sans-serif;
 }
@@ -27,26 +14,26 @@ a {
 
 div img {
 	width: 100%;
-	max-width: 225px; 
+	max-width: 225px;
 }
 
-/* grid system -- mobile first! */
-/* flex contatiner */
 
+/*
+  Each .row becomes a grid container.
+*/
 .row {
-	display: flex;
-	flex-flow: row wrap;
+	display: grid;
+  /* By default, one column for mobile */
+	grid-template-columns: 1fr; 
+	gap: 10px; /* Spacing between grid items */
+  	padding: 10px 0; /* Add some vertical spacing between rows */
 }
-
-/* attribute selector to give some margin between columns and apply styles to flex items */
 
 [class*="col-"] {
-	margin-left: 4%;
-	flex: 0 0 92%;
+	padding: 20px;
 }
 
-/* Add background colors to see how much space each column is taking */
-
+/* Add background colors for visual reference */
 .col-1 {
 	background-color: #A3CDD9;
 }
@@ -70,40 +57,85 @@ div img {
 /* Tablet Landscape Screen Sizes */
 @media only screen and (min-width: 480px)  {
 	
-  .col-1,
-  .col-2,
-  .col-3,
-  .col-4,
-  .col-half {
-		flex: 0 0 44%;
+  /* For screen sizes >= 480px, the grid will use 2 equally sized columns. */
+	.row {
+		grid-template-columns: repeat(2, 1fr);
 	}
   
+  /* The col-4 element should span both columns in this view */
+  .col-4 {
+    grid-column: 1 / span 2;
+  }
   
-
-
-
+  /* The col-half elements are now smaller and only span one column. */
+  .col-half {
+    grid-column: span 1;
+  }
 }
+
 /* Desktop screen Sizes */
 @media only screen and (min-width: 768px) {
   
-	.col-half {
-		flex: 0 0 15.2%;
-	}
-
- 	.col-1 {
-		flex: 0 0 20%;
+  /*
+    4-column grid (1fr 1fr 1fr 1fr)
+  */
+	.row {
+		grid-template-columns: repeat(4	, 1fr);
 	}
   
-	.col-2 {
-		flex: 0 0 44%;
+  /* Mapping the old widths to the new 4-column grid:
+    
+    .col-1 (old 20%) -> grid-column: span 1 
+    .col-2 (old 44%) -> grid-column: span 2 
+    .col-3 (old 68%) -> grid-column: span 3 
+    .col-4 (old 92%) -> grid-column: span 4 
+    .col-half (old 15.2% approx) -> grid-column: span 1/2 or span 1 in this 4-column setup
+  */
+
+  /* row 1: 4 individual boxes (col-1) */
+  .row:nth-child(1) .col-1 {
+    grid-column: span 1;
+  }
+  
+  /* row 2: 2 boxes spanning 2 columns (col-2) */
+	.row:nth-child(2) .col-2 {
+		grid-column: span 2;
 	}
 
-	.col-3 {
-		flex: 0 0 68%;
+  /* row 3: narrow left column (col-1), wide right/content column (col-3) */
+  .row:nth-child(3) .col-1 {
+    grid-column: span 1;
+  }
+	.row:nth-child(3) .col-3 {
+		grid-column: span 3;
 	}
+  
+  /* row 4: one column spanning all 4 columns (col-4) */
+	.row:nth-child(4) .col-4 {
+		grid-column: span 4;
+	}
+  
+  /* row 5: 1-2-1 individual boxes */
+  .row:nth-child(5) .col-1:nth-child(1) {
+    grid-column: span 1;
+  }
+  .row:nth-child(5) .col-2 {
+    grid-column: span 2;
+  }
+  .row:nth-child(5) .col-1:nth-child(2) {
+    grid-column: span 1;
+  }
 
-	.col-4 {
-		flex: 0 0 92%;
+  /* row 6: five col-half elements. Since the grid is 4 columns, we'll give each a column span of 1.
+     A new template has to be created to span 5 columns
+  */
+
+  	.row:nth-child(6) {
+		grid-template-columns: repeat(5, 1fr);
+	}
+	.row:nth-child(6) .col-half {
+		grid-column: span 1;
+
 	}
 
 }
